@@ -120,6 +120,8 @@ enable_or_disable: ENABLE | DISABLE;
 
 up_or_down: UP | DOWN;
 
+some_port: uint16;
+
 port_range: port_low = uint16 (HYPHEN port_high = uint16)?;
 
 allow_or_deny: ALLOW | DENY;

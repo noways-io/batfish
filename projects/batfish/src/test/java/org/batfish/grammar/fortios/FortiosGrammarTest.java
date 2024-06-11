@@ -3005,6 +3005,12 @@ public final class FortiosGrammarTest {
     assertThat(vc.getAccessLists().get("acl_name1").getRules(), anEmptyMap());
   }
 
+  @Test
+  public void testVIPsExtraction() {
+    FortiosConfiguration vc = parseVendorConfig("vip");
+    assertThat(vc.getVIPs().keySet(), containsInAnyOrder("vip_1"));
+  }
+
   ////////////////////////
   // Setup / test infra //
   ////////////////////////

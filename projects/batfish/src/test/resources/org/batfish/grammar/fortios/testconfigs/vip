@@ -1,0 +1,15 @@
+config system global
+    set hostname "fortios-vip"
+end
+
+config firewall vip
+    edit "vip_1"
+         set uuid aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa
+         set extip 213.214.215.216
+         set mappedip "172.16.0.2"
+         set extintf "any"
+         set portforward enable
+         set extport 80
+         set mappedport 8080
+    next
+end

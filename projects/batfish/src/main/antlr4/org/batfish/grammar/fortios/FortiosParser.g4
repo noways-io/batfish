@@ -15,6 +15,7 @@ import
   Fortios_service,
   Fortios_static,
   Fortios_system,
+  Fortios_vip,
   Fortios_zone;
 
 options {

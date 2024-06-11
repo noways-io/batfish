@@ -12,6 +12,7 @@ import static org.batfish.representation.fortios.FortiosPolicyConversions.toIpSp
 import static org.batfish.representation.fortios.FortiosPolicyConversions.toMatchExpr;
 import static org.batfish.representation.fortios.FortiosRouteConversions.convertStaticRoutes;
 
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -45,6 +46,7 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.collections.InsertOrderedMap;
+import org.batfish.representation.fortios.VIP;
 import org.batfish.representation.fortios.Interface.Speed;
 import org.batfish.representation.fortios.Interface.Type;
 import org.batfish.vendor.VendorConfiguration;
@@ -66,6 +68,7 @@ public class FortiosConfiguration extends VendorConfiguration {
     _serviceGroups = new HashMap<>();
     _staticRoutes = new HashMap<>();
     _zones = new HashMap<>();
+    _vips = new HashMap<>();
   }
 
   @Override
@@ -152,6 +155,11 @@ public class FortiosConfiguration extends VendorConfiguration {
     return _zones;
   }
 
+  /** name -> VIP */
+  public @Nonnull Map<String, VIP> getVIPs() {
+    return _vips;
+  }
+
   /** Initializes configuration's {@link BgpProcess} if it isn't already initialized */
   public void initBgpProcess() {
     if (_bgpProcess == null) {
@@ -175,6 +183,7 @@ public class FortiosConfiguration extends VendorConfiguration {
   private final @Nonnull Map<String, ServiceGroup> _serviceGroups;
   private final @Nonnull Map<String, StaticRoute> _staticRoutes;
   private final @Nonnull Map<String, Zone> _zones;
+  private final @Nonnull Map<String, VIP> _vips;
 
   private @Nullable BgpProcess _bgpProcess;
 

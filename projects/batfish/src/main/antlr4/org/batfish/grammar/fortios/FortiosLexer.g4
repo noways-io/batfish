@@ -149,6 +149,9 @@ END_IP: 'end-ip';
 EXACT_MATCH: 'exact-match';
 EXCLUDE: 'exclude';
 EXCLUDE_MEMBER: 'exclude-member' -> pushMode(M_Str);
+EXTINTF: 'extintf';
+EXTIP: 'extip';
+EXTPORT: 'extport';
 FABRIC_OBJECT: 'fabric-object';
 FIREWALL: 'firewall';
 FOLDER: 'folder';
@@ -173,6 +176,8 @@ HTTP: 'http' {
     pushMode(M_Str);
   }
 };
+HTTP_IP_HEADER: 'http-ip-header';
+HTTP_MULTIPLEX: 'http-multiplex';
 IBGP_MULTIPATH: 'ibgp-multipath';
 ICAP: 'icap' {
   if (lastTokenType() == REPLACEMSG) {
@@ -193,6 +198,7 @@ IPMASK: 'ipmask';
 IPRANGE: 'iprange';
 IP_UPPER: 'IP';
 IPSEC: 'ipsec';
+LDB_METHOD: 'ldb-method';
 LOCATION: 'location';
 LOOPBACK: 'loopback';
 MAC: 'mac';
@@ -201,8 +207,11 @@ MAIL: 'mail' {
     pushMode(M_Str);
   }
 };
+MAPPEDIP: 'mappedip';
+MAPPEDPORT: 'mappedport';
 MATCH_IP_ADDRESS: 'match-ip-address' -> pushMode(M_Str);
 MEMBER: 'member' -> pushMode(M_Str);
+MONITOR: 'monitor';
 MOVE: 'move' -> pushMode(M_SingleStr);
 MTU: 'mtu';
 MTU_OVERRIDE: 'mtu-override';
@@ -232,9 +241,12 @@ NP6: 'np6' {
 PERMIT: 'permit';
 PHYSICAL: 'physical';
 POLICY: 'policy';
+PORT: 'port';
+PORTFORWARD: 'portforward';
 PREFIX: 'prefix';
 PROTOCOL: 'protocol';
 PROTOCOL_NUMBER: 'protocol-number';
+REALSERVERS: 'realservers';
 REDISTRIBUTE: 'redistribute' -> pushMode(M_Str);
 REDUNDANT: 'redundant';
 REMOTE_AS: 'remote-as' -> pushMode(M_Str);
@@ -259,6 +271,7 @@ SDWAN: 'sdwan';
 SECONDARY_IP: 'secondary-IP';
 SECONDARYIP: 'secondaryip';
 SELECT: 'select';
+SERVER_TYPE: 'server-type';
 SERVICE:
   'service'
   {
@@ -340,6 +353,7 @@ UTM: 'utm' {
 };
 UUID: 'uuid' -> pushMode(M_Str);
 VDOM: 'vdom' -> pushMode(M_Str);
+VIP: 'vip';
 VISIBILITY: 'visibility';
 VLAN: 'vlan';
 VLANID: 'vlanid';
