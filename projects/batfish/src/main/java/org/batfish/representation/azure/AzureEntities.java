@@ -17,6 +17,7 @@ public interface AzureEntities {
     String JSON_KEY_VNET_IP_CONFIGURATIONS = "ipConfigurations";
     String JSON_KEY_INTERFACE_PRIVATE_IP_ADDRESS = "privateIPAddress";
     String JSON_KEY_INTERFACE_MAC_ADDRESS = "macAddress";
+    String JSON_KEY_INTERFACE_SUBNET = "subnet";
 
     String JSON_TYPE_VM = "Microsoft.Compute/virtualMachines";
     String JSON_TYPE_VNET = "Microsoft.Network/virtualNetworks";
