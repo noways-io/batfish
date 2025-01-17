@@ -23,6 +23,10 @@ public class ResourceGroup {
         return _interfaces;
     }
 
+    public Map<String, Subnet> getSubnets() {
+        return _subnets;
+    }
+
     public Map<String, Instance> getInstances() {
         return _instances;
     }

@@ -57,6 +57,9 @@ public class VirtualMachine extends Instance{
 
             ConcreteInterfaceAddress concreteInterfaceAddress = null;
             for (IPConfiguration ipConfiguration : networkInterface.getProperties().getIPConfigurations()){
+                Subnet subnet = rgp.getSubnets().get(ipConfiguration.getProperties().getSubnetId());
+                // TODO: need to draw edge between subnet and interface ip
+
                 concreteInterfaceAddress = ConcreteInterfaceAddress.create(
                         ipConfiguration.getProperties().getPrivateIpAddress(), 24);
             }
