@@ -10,25 +10,7 @@ import org.batfish.datamodel.Prefix;
 
 import javax.annotation.Nullable;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-class SubnetProperties {
-    final private Prefix _addressPrefix;
 
-    @JsonCreator
-    public static SubnetProperties create(
-        @JsonProperty("addressPrefix") @Nullable Prefix addressPrefix
-    ){
-        return new SubnetProperties(addressPrefix);
-    }
-
-    SubnetProperties(Prefix addressPrefix) {
-        _addressPrefix = addressPrefix;
-    }
-
-    Prefix getAddressPrefix() {
-        return _addressPrefix;
-    }
-}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Subnet extends Resource {
@@ -51,6 +33,7 @@ public class Subnet extends Resource {
     }
 
     private Ip computeInstancesIfaceIp(){
+        // give first IP like a router ?
         long generatedIp = properties.getAddressPrefix().getStartIp().asLong() + 1L;
         return Ip.create(generatedIp);
     }
@@ -66,5 +49,25 @@ public class Subnet extends Resource {
                 ConcreteInterfaceAddress.create(instancesIfaceIp, properties.getAddressPrefix().getPrefixLength());
 
         return cfgNode;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SubnetProperties {
+        final private Prefix _addressPrefix;
+
+        @JsonCreator
+        public static SubnetProperties create(
+                @JsonProperty("addressPrefix") @Nullable Prefix addressPrefix
+        ){
+            return new SubnetProperties(addressPrefix);
+        }
+
+        SubnetProperties(Prefix addressPrefix) {
+            _addressPrefix = addressPrefix;
+        }
+
+        Prefix getAddressPrefix() {
+            return _addressPrefix;
+        }
     }
 }
