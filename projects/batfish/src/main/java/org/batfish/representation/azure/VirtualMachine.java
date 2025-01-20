@@ -51,7 +51,7 @@ public class VirtualMachine extends Instance{
     @Override
     public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
-                .setHostname(getId().replace('/', '_'))
+                .setHostname(getName())
                 .setHumanName(getName())
                 .setDomainName("azure")
                 .setDeviceModel(DeviceModel.AZURE_VM)
@@ -89,7 +89,7 @@ public class VirtualMachine extends Instance{
 
             // assign itself to this device through setOwner
             Interface.builder()
-                    .setName(networkInterface.getId().replace('/', '_'))
+                    .setName(networkInterface.getName())
                     .setAddress(concreteInterfaceAddress)
                     .setHumanName(networkInterface.getName())
                     .setOwner(cfgNode)
