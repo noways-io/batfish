@@ -70,17 +70,24 @@ public class VirtualMachine extends Instance{
         for(NetworkInterfaceId networkInterfaceId : _properties.getNetworkProfile().getNetworkInterfaces()){
             NetworkInterface networkInterface =  rgp.getInterfaces().get(networkInterfaceId.getId());
 
-
+            // temporary (unclear information's about multi ips and subnet on a unique interface)
+            // only 1 IP per endpoint (instance) for now
+            Subnet subnet = null;
             ConcreteInterfaceAddress concreteInterfaceAddress = null;
+
             for (IPConfiguration ipConfiguration : networkInterface.getProperties().getIPConfigurations()){
-                Subnet subnet = rgp.getSubnets().get(ipConfiguration.getProperties().getSubnetId());
+                subnet = rgp.getSubnets().get(ipConfiguration.getProperties().getSubnetId());
                 // TODO: need to draw edge between subnet and interface ip
 
                 concreteInterfaceAddress = ConcreteInterfaceAddress.create(
-                        ipConfiguration.getProperties().getPrivateIpAddress(), 24);
+                        ipConfiguration.getProperties().getPrivateIpAddress(),
+                        subnet.getProperties().getAddressPrefix().getPrefixLength());
             }
 
-            // assign itself to this device through cfgNode
+            // security check for the trick above
+            if (subnet == null) continue;
+
+            // assign itself to this device through setOwner
             Interface.builder()
                     .setName(networkInterface.getId().replace('/', '_'))
                     .setAddress(concreteInterfaceAddress)
