@@ -49,7 +49,7 @@ public class VirtualMachine extends Instance{
 
 
     @Override
-    public Configuration toConfigurationNode(ResourceGroup rgp){
+    public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
                 .setHostname(getId().replace('/', '_'))
                 .setHumanName(getName())

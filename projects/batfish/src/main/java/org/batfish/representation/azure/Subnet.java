@@ -39,6 +39,7 @@ public class Subnet extends Resource {
     }
 
     public Configuration toConfigurationNode(){
+    public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
                 .setHumanName(getName())
                 .setHostname(getId())
