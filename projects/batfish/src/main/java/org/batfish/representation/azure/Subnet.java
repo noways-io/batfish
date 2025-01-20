@@ -43,7 +43,14 @@ public class Subnet extends Resource {
         return Ip.create(generatedIp);
     }
 
-    public Configuration toConfigurationNode(){
+    public String getNodeName(){
+        return "subnet-node-" + getName();
+    }
+
+    public String getInterfaceName(){
+        return "subnet-interface-" + getName();
+    }
+
     public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
                 .setHumanName(getName())
