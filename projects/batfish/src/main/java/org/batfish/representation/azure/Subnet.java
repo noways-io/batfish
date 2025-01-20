@@ -37,7 +37,7 @@ public class Subnet extends Resource {
         _properties = properties;
     }
 
-    private Ip computeInstancesIfaceIp(){
+    public Ip computeInstancesIfaceIp(){
         // give first IP like a router ?
         long generatedIp = _properties.getAddressPrefix().getStartIp().asLong() + 1L;
         return Ip.create(generatedIp);
