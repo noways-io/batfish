@@ -54,7 +54,17 @@ public class Subnet extends Resource {
     public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
                 .setHumanName(getName())
-                .setHostname(getId())
+                .setHostname(getNodeName())
+                .setDomainName("azure")
+                .setConfigurationFormat(ConfigurationFormat.AZURE)
+                .setDefaultCrossZoneAction(LineAction.PERMIT)
+                .setDefaultInboundAction(LineAction.PERMIT)
+                .setDeviceModel(DeviceModel.AZURE_SUBNET)
+                .build();
+
+        Vrf.builder()
+                .setName(Configuration.DEFAULT_VRF_NAME)
+                .setOwner(cfgNode)
                 .build();
 
         Ip instancesIfaceIp = computeInstancesIfaceIp();
