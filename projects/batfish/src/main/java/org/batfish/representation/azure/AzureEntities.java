@@ -13,6 +13,7 @@ public interface AzureEntities {
 
     String JSON_KEY_VNET_SUBNETS = "subnets";
     String JSON_KEY_VNET_ADDRESS_SPACE = "addressSpace";
+    String JSON_KEY_VNET_ADDRESS_PREFIX = "addressPrefixes";
 
     String JSON_KEY_VNET_IP_CONFIGURATIONS = "ipConfigurations";
     String JSON_KEY_INTERFACE_PRIVATE_IP_ADDRESS = "privateIPAddress";
