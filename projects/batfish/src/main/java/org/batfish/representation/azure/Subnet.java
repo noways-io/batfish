@@ -81,6 +81,10 @@ public class Subnet extends Resource {
         return cfgNode;
     }
 
+    public SubnetProperties getProperties() {
+        return _properties;
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SubnetProperties {
         final private Prefix _addressPrefix;
