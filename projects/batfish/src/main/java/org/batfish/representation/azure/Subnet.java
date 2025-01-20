@@ -7,6 +7,11 @@ import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.Interface;
+import org.batfish.datamodel.ConfigurationFormat;
+import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.DeviceModel;
+import org.batfish.datamodel.Vrf;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +20,7 @@ import javax.annotation.Nullable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Subnet extends Resource {
 
-    final private SubnetProperties properties;
+    final private SubnetProperties _properties;
 
     @JsonCreator
     private static Subnet create(
@@ -29,12 +34,12 @@ public class Subnet extends Resource {
 
     public Subnet(String id, String name, String type, SubnetProperties properties) {
         super(name, id, type);
-        this.properties = properties;
+        _properties = properties;
     }
 
     private Ip computeInstancesIfaceIp(){
         // give first IP like a router ?
-        long generatedIp = properties.getAddressPrefix().getStartIp().asLong() + 1L;
+        long generatedIp = _properties.getAddressPrefix().getStartIp().asLong() + 1L;
         return Ip.create(generatedIp);
     }
 
@@ -47,7 +52,14 @@ public class Subnet extends Resource {
 
         Ip instancesIfaceIp = computeInstancesIfaceIp();
         ConcreteInterfaceAddress instancesIfaceAddress =
-                ConcreteInterfaceAddress.create(instancesIfaceIp, properties.getAddressPrefix().getPrefixLength());
+                ConcreteInterfaceAddress.create(instancesIfaceIp, _properties.getAddressPrefix().getPrefixLength());
+
+        Interface.builder()
+                .setAddress(instancesIfaceAddress)
+                .setName(getInterfaceName())
+                .setOwner(cfgNode)
+                .setVrf(cfgNode.getDefaultVrf())
+                .build();
 
         return cfgNode;
     }
