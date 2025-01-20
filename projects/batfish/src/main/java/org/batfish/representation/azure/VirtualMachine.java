@@ -80,9 +80,9 @@ public class VirtualMachine extends Instance{
                     .setVrf(cfgNode.getDefaultVrf())
                     .build();
 
-            // default route
+            // default route to the subnet iface (to be clarified)
             StaticRoute st = StaticRoute.builder()
-                    .setNextHopIp(concreteInterfaceAddress.getIp())
+                    .setNextHopIp(subnet.computeInstancesIfaceIp())
                     .setAdministrativeCost(0)
                     .setMetric(0)
                     .setNetwork(Prefix.ZERO)
@@ -93,6 +93,10 @@ public class VirtualMachine extends Instance{
             // draw edges toward other devices on the subnet
             // gateway like aws or one edge between each device ?
             // set a virtual switch ? (layer 2 node)
+            convertedConfiguration.addLayer1Edge(
+                    getName(), networkInterface.getName(),
+                    subnet.getNodeName(), subnet.getInterfaceName());
+
 
         }
 
