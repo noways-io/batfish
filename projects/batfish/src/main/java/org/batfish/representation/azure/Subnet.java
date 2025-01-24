@@ -3,6 +3,7 @@ package org.batfish.representation.azure;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.batfish.common.BatfishException;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Ip;
@@ -71,12 +72,28 @@ public class Subnet extends Resource {
         ConcreteInterfaceAddress instancesIfaceAddress =
                 ConcreteInterfaceAddress.create(instancesIfaceIp, _properties.getAddressPrefix().getPrefixLength());
 
-        Interface.builder()
+        Interface lanInterface = Interface.builder()
                 .setAddress(instancesIfaceAddress)
                 .setName(getInterfaceName())
                 .setOwner(cfgNode)
                 .setVrf(cfgNode.getDefaultVrf())
                 .build();
+
+        // ACL
+        {
+            String nsgId = _properties.getNetworkSecurityGroupId();
+            if(nsgId != null) {
+                NetworkSecurityGroup nsg =
+                        rgp.getNetworkSecurityGroups().get(nsgId);
+
+                if (nsg == null) {
+                    throw new BatfishException(String.format("Unable to apply the NSG %s on subnet %s.\n" +
+                            "Missing nsg file !", getName(), nsgId));
+                }
+
+                nsg.applyToInterface(lanInterface);
+            }
+        }
 
         return cfgNode;
     }
