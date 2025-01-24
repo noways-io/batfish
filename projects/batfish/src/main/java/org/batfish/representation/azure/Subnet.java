@@ -88,20 +88,44 @@ public class Subnet extends Resource {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SubnetProperties {
         final private Prefix _addressPrefix;
+        final private NetworkSecurityGroupId _nsg;
 
         @JsonCreator
         public static SubnetProperties create(
-                @JsonProperty("addressPrefix") @Nullable Prefix addressPrefix
+                @JsonProperty("addressPrefix") @Nullable Prefix addressPrefix,
+                @JsonProperty(AzureEntities.JSON_KEY_INTERFACE_NGS) NetworkSecurityGroupId nsg
         ){
-            return new SubnetProperties(addressPrefix);
+            return new SubnetProperties(addressPrefix, nsg);
         }
 
-        SubnetProperties(Prefix addressPrefix) {
+        SubnetProperties(Prefix addressPrefix, NetworkSecurityGroupId nsg) {
             _addressPrefix = addressPrefix;
+            _nsg = nsg;
         }
 
         Prefix getAddressPrefix() {
             return _addressPrefix;
+        }
+
+        public String getNetworkSecurityGroupId(){
+            if (_nsg == null) return null;
+            return _nsg.getId();
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class NetworkSecurityGroupId {
+        private final String _id;
+
+        @JsonCreator
+        public NetworkSecurityGroupId(
+                @JsonProperty(AzureEntities.JSON_KEY_ID) String id)
+        {
+            _id = id;
+        }
+
+        public String getId() {
+            return _id;
         }
     }
 }
