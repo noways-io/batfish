@@ -136,4 +136,8 @@ public class VirtualMachine extends Instance{
         }
     }
 
+    public VirtualMachineProperties getProperties() {
+        return _properties;
+    }
+
 }
