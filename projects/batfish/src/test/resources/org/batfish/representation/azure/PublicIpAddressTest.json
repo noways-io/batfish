@@ -1,0 +1,22 @@
+{
+  "id": "resourceGroups/test/providers/Microsoft.Network/publicIPAddresses/test-ip",
+  "name": "test-ip",
+  "type": "Microsoft.Network/publicIPAddresses",
+  "location": "westeurope",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "resourceGuid": "fa724bc0-13b0-4a4f-8f60-08a099b6a80c",
+    "ipAddress": "40.40.40.40",
+    "publicIPAddressVersion": "IPv4",
+    "publicIPAllocationMethod": "Static",
+    "idleTimeoutInMinutes": 4,
+    "ipTags": [],
+    "ipConfiguration": {
+      "id": "resourceGroups/test/providers/Microsoft.Network/networkInterfaces/vm1346/ipConfigurations/ipconfig1"
+    }
+  },
+  "sku": {
+    "name": "Standard",
+    "tier": "Regional"
+  }
+}
