@@ -14,6 +14,7 @@ public class ResourceGroup {
     private final Map<String, Subnet> _subnets = new HashMap<>();
     private final Map<String, Instance> _instances = new HashMap<>();
     private final Map<String, NetworkSecurityGroup> _networkSecurityGroups = new HashMap<>();
+    private final Map<String, PublicIpAddress> _publicIpAddresses = new HashMap<>();
     private final String _regionName;
 
     public ResourceGroup(String regionName) {
@@ -65,6 +66,10 @@ public class ResourceGroup {
             case AzureEntities.JSON_TYPE_NETWORK_SECURITY_GROUP:
                 NetworkSecurityGroup nsg = BatfishObjectMapper.mapper().convertValue(node, NetworkSecurityGroup.class);
                 _networkSecurityGroups.put(nsg.getId(), nsg);
+                break;
+            case AzureEntities.JSON_TYPE_PUBLIC_IP:
+                PublicIpAddress publicIp = BatfishObjectMapper.mapper().convertValue(node, PublicIpAddress.class);
+                _publicIpAddresses.put(publicIp.getId(), publicIp);
                 break;
             default:
                 return;
