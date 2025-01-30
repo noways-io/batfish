@@ -17,8 +17,15 @@ public class Resource implements Serializable {
 
     public Resource(String name, String id, String type) {
         _name = name;
-        _id = id;
+        _id = convertId(id);
         _type = type;
+    }
+
+    public static String convertId(String id){
+        String[] parts = id.split("/");
+
+        // subscription id - resourceGroup name - Resource name
+        return String.format("%s-%s-%s", parts[2], parts[4], parts[8]);
     }
 
     public String getName() {
