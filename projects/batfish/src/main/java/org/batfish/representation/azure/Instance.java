@@ -52,5 +52,5 @@ public abstract class Instance extends Resource {
 
 
 
-    public abstract Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration);
+    public abstract Configuration toConfigurationNode(Region rgp, ConvertedConfiguration convertedConfiguration);
 }

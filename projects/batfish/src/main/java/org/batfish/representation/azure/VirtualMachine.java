@@ -34,7 +34,7 @@ public class VirtualMachine extends Instance{
 
 
     @Override
-    public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
+    public Configuration toConfigurationNode(Region rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
                 .setHostname(getName())
                 .setHumanName(getName())

@@ -7,7 +7,7 @@ import org.batfish.datamodel.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResourceGroup {
+public class Region {
 
 
     private final Map<String, NetworkInterface> _interfaces = new HashMap<>();
@@ -16,7 +16,7 @@ public class ResourceGroup {
     private final Map<String, NetworkSecurityGroup> _networkSecurityGroups = new HashMap<>();
     private final String _regionName;
 
-    public ResourceGroup(String regionName) {
+    public Region(String regionName) {
         this._regionName = regionName;
     }
 

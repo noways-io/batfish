@@ -52,7 +52,7 @@ public class Subnet extends Resource {
         return "subnet-interface-" + getName();
     }
 
-    public Configuration toConfigurationNode(ResourceGroup rgp, ConvertedConfiguration convertedConfiguration){
+    public Configuration toConfigurationNode(Region rgp, ConvertedConfiguration convertedConfiguration){
         Configuration cfgNode = Configuration.builder()
                 .setHumanName(getName())
                 .setHostname(getNodeName())
