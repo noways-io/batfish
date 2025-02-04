@@ -15,11 +15,11 @@ import org.batfish.datamodel.DeviceModel;
 import org.batfish.datamodel.Vrf;
 
 import javax.annotation.Nullable;
-
+import java.io.Serializable;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Subnet extends Resource {
+public class Subnet extends Resource implements Serializable {
 
     final private SubnetProperties _properties;
 
@@ -103,7 +103,7 @@ public class Subnet extends Resource {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class SubnetProperties {
+    public static class SubnetProperties implements Serializable{
         final private Prefix _addressPrefix;
         final private NetworkSecurityGroupId _nsg;
 
@@ -131,7 +131,7 @@ public class Subnet extends Resource {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class NetworkSecurityGroupId {
+    public static class NetworkSecurityGroupId implements Serializable{
         private final String _id;
 
         @JsonCreator

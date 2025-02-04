@@ -16,8 +16,10 @@ import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class VirtualMachine extends Instance{
+public class VirtualMachine extends Instance implements Serializable {
 
     private final VirtualMachineProperties _properties;
 
@@ -121,7 +123,7 @@ public class VirtualMachine extends Instance{
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class VirtualMachineProperties{
+    public static class VirtualMachineProperties implements Serializable{
         private final NetworkProfile _networkProfile;
 
         @JsonCreator

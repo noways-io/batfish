@@ -19,7 +19,7 @@ public class AzureConfiguration extends VendorConfiguration {
 
     // only one resource group to start testing
     // next, we will be able to define multiple resource group based on folder structure (Batfish.java)
-    private static final Map<String, Region> _regions = new HashMap<>();
+    private final Map<String, Region> _regions = new HashMap<>();
 
     private ConvertedConfiguration _convertedConfiguration = null;
 

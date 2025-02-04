@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.datamodel.Configuration;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Region {
+public class Region implements Serializable {
 
 
     private final Map<String, NetworkInterface> _interfaces = new HashMap<>();
