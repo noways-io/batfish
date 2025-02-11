@@ -48,8 +48,8 @@ public class Subnet extends Resource implements Serializable {
         return "subnet-node-" + getName();
     }
 
-    public String getInterfaceName(){
-        return "subnet-interface-" + getName();
+    public String getToLanInterfaceName(){
+        return "to-lan";
     }
 
     public Configuration toConfigurationNode(Region rgp, ConvertedConfiguration convertedConfiguration){
