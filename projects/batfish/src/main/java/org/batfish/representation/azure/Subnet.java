@@ -46,7 +46,7 @@ public class Subnet extends Resource implements Serializable {
     }
 
     public String getNodeName(){
-        return "subnet-node-" + getName();
+        return "subnet-node-" + getName().toLowerCase();
     }
 
     public String getToLanInterfaceName(){
