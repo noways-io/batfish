@@ -31,7 +31,7 @@ public class VNet extends Resource {
             @JsonProperty(AzureEntities.JSON_KEY_NAME) String name,
             @JsonProperty(AzureEntities.JSON_KEY_TYPE) String type,
             @JsonProperty(AzureEntities.JSON_KEY_PROPERTIES) VNetProperties properties) {
-        super(id, name, type);
+        super(name, id, type);
         _properties = properties;
     }
 
