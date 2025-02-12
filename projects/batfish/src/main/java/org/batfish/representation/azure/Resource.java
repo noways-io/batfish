@@ -8,6 +8,9 @@ public class Resource implements Serializable {
     private final String _id;
     private final String _type;
 
+    // Batfish doesn't accept '/' in hostnames
+    private final String _cleanId;
+
     public static Resource create(
             String id,
             String type,
@@ -17,15 +20,13 @@ public class Resource implements Serializable {
 
     public Resource(String name, String id, String type) {
         _name = name;
-        _id = convertId(id);
+        _id = id;
         _type = type;
+        _cleanId = convertId(id);
     }
 
-    public static String convertId(String id){
-        String[] parts = id.split("/");
-
-        // subscription id - resourceGroup name - Resource name
-        return String.format("%s-%s-%s", parts[2], parts[4], parts[8]);
+    private static String convertId(String id){
+        return id.replace('/', '_');
     }
 
     public String getName() {
@@ -38,6 +39,10 @@ public class Resource implements Serializable {
 
     public String getType() {
         return _type;
+    }
+
+    public String getCleanId() {
+        return _cleanId;
     }
 
 
