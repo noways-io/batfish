@@ -8,9 +8,17 @@ import org.batfish.common.topology.Layer1Edge;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.collections.NodeInterfacePair;
+import org.batfish.datamodel.isp_configuration.BorderInterfaceInfo;
+import org.batfish.datamodel.isp_configuration.IspAnnouncement;
+import org.batfish.datamodel.isp_configuration.IspConfiguration;
+import org.batfish.datamodel.isp_configuration.IspFilter;
+import org.batfish.datamodel.isp_configuration.IspNodeInfo;
 import org.batfish.vendor.VendorConfiguration;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,5 +96,28 @@ public class AzureConfiguration extends VendorConfiguration {
 
     public @Nonnull Set<Layer1Edge> getLayer1Edges() {
         return _convertedConfiguration.getLayer1Edges();
+    }
+
+    @Override
+    public @Nonnull IspConfiguration getIspConfiguration() {
+        List<BorderInterfaceInfo> borderInterfaceInfos = new ArrayList<>();
+        borderInterfaceInfos.add(
+                new BorderInterfaceInfo(
+                        NodeInterfacePair.of("nat-gateway-default", "backbone"))
+        );
+        borderInterfaceInfos.add(
+                new BorderInterfaceInfo(
+                        NodeInterfacePair.of("nat-gateway-private", "backbone")
+                )
+        );
+        return new IspConfiguration(
+                borderInterfaceInfos,
+                ImmutableList.of(),
+                IspFilter.ALLOW_ALL,
+                ImmutableList.of(
+                new IspNodeInfo(
+                        8075, "azure-backbone", List.of(new IspAnnouncement(Prefix.parse("88.183.185.217/32")))
+                )),
+                ImmutableList.of());
     }
 }
