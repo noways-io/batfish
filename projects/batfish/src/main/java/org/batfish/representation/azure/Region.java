@@ -86,6 +86,10 @@ public class Region implements Serializable {
         }
 
         for (Subnet subnet : _subnets.values()) {
+            NatGateway natGateway = new NatGateway( "nat-gateway-" + subnet.getName());
+            Configuration natNode = natGateway.toConfigurationNode(convertedConfiguration);
+            convertedConfiguration.addNode(natNode);
+
             Configuration cfgNode = subnet.toConfigurationNode(this, convertedConfiguration);
             convertedConfiguration.addNode(cfgNode);
         }
