@@ -127,27 +127,41 @@ public class Subnet extends Resource implements Serializable {
     public static class SubnetProperties implements Serializable{
         final private Prefix _addressPrefix;
         final private NetworkSecurityGroupId _nsg;
+        final private String _natGatewayId;
+        final private List<IpConfiguration> _ipConfigurations;
 
         @JsonCreator
         public static SubnetProperties create(
                 @JsonProperty("addressPrefix") @Nullable Prefix addressPrefix,
-                @JsonProperty(AzureEntities.JSON_KEY_INTERFACE_NGS) NetworkSecurityGroupId nsg
+                @JsonProperty(AzureEntities.JSON_KEY_INTERFACE_NGS) NetworkSecurityGroupId nsg,
+                @JsonProperty("natGateway") String natGatewayId,
+                @JsonProperty("ipConfigurations") List<IpConfiguration> ipConfigurations
         ){
-            return new SubnetProperties(addressPrefix, nsg);
+            return new SubnetProperties(addressPrefix, nsg, natGatewayId, ipConfigurations);
         }
 
-        SubnetProperties(Prefix addressPrefix, NetworkSecurityGroupId nsg) {
+        SubnetProperties(Prefix addressPrefix, NetworkSecurityGroupId nsg, String natGatewayId, List<IpConfiguration> ipConfigurations) {
             _addressPrefix = addressPrefix;
             _nsg = nsg;
+            _natGatewayId = natGatewayId;
+            _ipConfigurations = ipConfigurations;
         }
 
-        Prefix getAddressPrefix() {
+        public Prefix getAddressPrefix() {
             return _addressPrefix;
         }
 
         public String getNetworkSecurityGroupId(){
             if (_nsg == null) return null;
             return _nsg.getId();
+        }
+
+        public String getNatGatewayId() {
+            return _natGatewayId;
+        }
+
+        public List<IpConfiguration> getIpConfigurations() {
+            return _ipConfigurations;
         }
     }
 
@@ -166,4 +180,20 @@ public class Subnet extends Resource implements Serializable {
             return _id;
         }
     }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class IpConfiguration implements Serializable{
+        private final String _id;
+
+        public IpConfiguration(
+                @JsonProperty(AzureEntities.JSON_KEY_ID) String id
+        ) {
+            _id = id;
+        }
+
+        public String getId() {
+            return _id;
+        }
+    }
+
 }
