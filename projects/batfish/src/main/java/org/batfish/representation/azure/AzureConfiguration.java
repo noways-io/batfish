@@ -22,6 +22,7 @@ public class AzureConfiguration extends VendorConfiguration {
     // next, we will be able to define multiple resource group based on folder structure (Batfish.java)
     private final Map<String, Region> _regions = new HashMap<>();
     public static final Ip LINK_LOCAL_IP = Ip.parse("169.254.0.1");
+    public static final long AZURE_LOCAL_ASN = 65536;
 
     private ConvertedConfiguration _convertedConfiguration = null;
 
