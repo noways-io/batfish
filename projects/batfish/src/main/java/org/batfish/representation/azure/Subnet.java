@@ -13,10 +13,16 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.DeviceModel;
+import org.batfish.datamodel.PrefixSpace;
+import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.route.nh.NextHop;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
+import java.util.List;
+
+import static org.batfish.common.util.isp.IspModelingUtils.installRoutingPolicyAdvertiseStatic;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -112,6 +118,44 @@ public class Subnet extends Resource implements Serializable {
                     .build();
 
             // static route set from Vnet object
+        }
+
+        { // Nat gateway
+
+            Interface toNat = Interface.builder()
+                    .setVrf(cfgNode.getDefaultVrf())
+                    .setOwner(cfgNode)
+                    .setName("nat-gateway")
+                    .setAddress(LinkLocalAddress.of(AzureConfiguration.LINK_LOCAL_IP))
+                    .setDescription("to nat gateway")
+                    .build();
+
+            Configuration natGatewayNode;
+            String natGatewayId = getProperties().getNatGatewayId();
+            if (natGatewayId != null) {
+                natGatewayNode = convertedConfiguration.getNode(natGatewayId);
+            } else {
+                natGatewayNode = convertedConfiguration.getNode("nat-gateway-" + getName());
+            }
+
+            convertedConfiguration.addLayer1Edge(
+                    cfgNode.getHostname(), toNat.getName(),
+                    natGatewayNode.getHostname(), "subnet"
+            );
+
+            StaticRoute st = StaticRoute.builder()
+                    .setNetwork(getProperties().getAddressPrefix())
+                    .setNonForwarding(false)
+                    .setNextHop(NextHop.legacyConverter("subnet", AzureConfiguration.LINK_LOCAL_IP))
+                    .setAdministrativeCost(0)
+                    .setMetric(0)
+                    .build();
+
+            natGatewayNode.getDefaultVrf().getStaticRoutes().add(st);
+
+            PrefixSpace pf = new PrefixSpace();
+            pf.addPrefix(getProperties().getAddressPrefix());
+            installRoutingPolicyAdvertiseStatic("test", natGatewayNode, pf);
         }
 
 
