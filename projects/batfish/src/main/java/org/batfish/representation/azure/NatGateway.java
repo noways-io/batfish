@@ -1,34 +1,45 @@
 package org.batfish.representation.azure;
 
-import org.batfish.datamodel.BgpProcess;
-import org.batfish.datamodel.BgpUnnumberedPeerConfig;
-import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.ConfigurationFormat;
-import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.InterfaceType;
-import org.batfish.datamodel.LineAction;
-import org.batfish.datamodel.LinkLocalAddress;
-import org.batfish.datamodel.Prefix;
-import org.batfish.datamodel.StaticRoute;
-import org.batfish.datamodel.Vrf;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
+import org.batfish.datamodel.*;
+import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.LocalOriginationTypeTieBreaker;
 import org.batfish.datamodel.route.nh.NextHop;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
+
+import static org.batfish.datamodel.IpProtocol.*;
 import static org.batfish.datamodel.bgp.NextHopIpTieBreaker.HIGHEST_NEXT_HOP_IP;
 
-public class NatGateway {
+public class NatGateway extends Resource implements Serializable {
 
-    private final String _name;
+    static final List<IpProtocol> NAT_PROTOCOLS = ImmutableList.of(TCP, UDP, ICMP);
+    private final NatGatewayProperties _properties;
 
-    public NatGateway(String name) {
-        _name = name;
+    public NatGateway(
+            @JsonProperty(AzureEntities.JSON_KEY_ID) String id,
+            @JsonProperty(AzureEntities.JSON_KEY_NAME) String name,
+            @JsonProperty(AzureEntities.JSON_KEY_TYPE) String type,
+            @JsonProperty(AzureEntities.JSON_KEY_PROPERTIES) NatGatewayProperties properties
+    )
+    {
+        super(name, id, type);
+        _properties = properties;
+    }
+
+    public String getNodeName() {
+        return getCleanId();
     }
 
     public Configuration toConfigurationNode(ConvertedConfiguration convertedConfiguration){
 
         Configuration cfgNode = Configuration.builder()
-                .setHostname(_name)
+                .setHostname(getCleanId())
                 .setConfigurationFormat(ConfigurationFormat.AZURE)
                 .setDefaultCrossZoneAction(LineAction.PERMIT)
                 .setDefaultInboundAction(LineAction.PERMIT)
@@ -93,5 +104,60 @@ public class NatGateway {
 
 
         return cfgNode;
+    }
+
+    public NatGatewayProperties getProperties() {
+        return _properties;
+    }
+
+    public static class NatGatewayProperties implements Serializable {
+        private final Set<PublicIpAddressId> _publicIpAddresses;
+        private final Set<PublicIpPrefixId>  _publicIpPrefixes;
+
+        @JsonCreator
+        public NatGatewayProperties(
+                @JsonProperty("publicIpAddresses") Set<PublicIpAddressId> publicIpAddresses,
+                @JsonProperty("publicIpPrefixes") Set<PublicIpPrefixId> publicIpPrefixes
+        ) {
+            _publicIpAddresses = publicIpAddresses;
+            _publicIpPrefixes = publicIpPrefixes;
+        }
+
+        public Set<PublicIpAddressId> getPublicIpAddresses() {
+            return _publicIpAddresses;
+        }
+
+        public Set<PublicIpPrefixId> getPublicIpPrefixes() {
+            return _publicIpPrefixes;
+        }
+    }
+
+    public static class PublicIpAddressId implements Serializable {
+        private final String _id;
+
+        @JsonCreator
+        public PublicIpAddressId(
+                @JsonProperty(AzureEntities.JSON_KEY_ID) String id) {
+            _id = id;
+        }
+
+        public String getId() {
+            return _id;
+        }
+    }
+
+    public static class PublicIpPrefixId implements Serializable {
+        private final String _id;
+
+        @JsonCreator
+        public PublicIpPrefixId(
+                @JsonProperty(AzureEntities.JSON_KEY_ID) String id
+        ) {
+            _id = id;
+        }
+
+        public String getId() {
+            return _id;
+        }
     }
 }
