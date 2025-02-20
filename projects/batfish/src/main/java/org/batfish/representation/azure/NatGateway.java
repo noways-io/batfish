@@ -1,31 +1,51 @@
 package org.batfish.representation.azure;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
-import org.batfish.datamodel.*;
+import org.batfish.datamodel.BgpProcess;
+import org.batfish.datamodel.BgpUnnumberedPeerConfig;
+import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.ConfigurationFormat;
+import org.batfish.datamodel.HeaderSpace;
+import org.batfish.datamodel.Interface;
+import org.batfish.datamodel.InterfaceType;
+import org.batfish.datamodel.IpProtocol;
+import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.LinkLocalAddress;
+import org.batfish.datamodel.PrefixSpace;
+import org.batfish.datamodel.StaticRoute;
+import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.LocalOriginationTypeTieBreaker;
-import org.batfish.datamodel.route.nh.NextHop;
+import org.batfish.datamodel.transformation.Transformation;
+import org.batfish.datamodel.transformation.TransformationStep;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import static org.batfish.datamodel.IpProtocol.*;
+import static org.batfish.common.util.isp.IspModelingUtils.installRoutingPolicyAdvertiseStatic;
+import static org.batfish.datamodel.Interface.NULL_INTERFACE_NAME;
+import static org.batfish.datamodel.IpProtocol.TCP;
+import static org.batfish.datamodel.IpProtocol.UDP;
+import static org.batfish.datamodel.IpProtocol.ICMP;
+
 import static org.batfish.datamodel.bgp.NextHopIpTieBreaker.HIGHEST_NEXT_HOP_IP;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NatGateway extends Resource implements Serializable {
 
     static final List<IpProtocol> NAT_PROTOCOLS = ImmutableList.of(TCP, UDP, ICMP);
-    private final NatGatewayProperties _properties;
+    private final Properties _properties;
 
     public NatGateway(
             @JsonProperty(AzureEntities.JSON_KEY_ID) String id,
             @JsonProperty(AzureEntities.JSON_KEY_NAME) String name,
             @JsonProperty(AzureEntities.JSON_KEY_TYPE) String type,
-            @JsonProperty(AzureEntities.JSON_KEY_PROPERTIES) NatGatewayProperties properties
+            @JsonProperty(AzureEntities.JSON_KEY_PROPERTIES) Properties properties
     )
     {
         super(name, id, type);
@@ -36,7 +56,7 @@ public class NatGateway extends Resource implements Serializable {
         return getCleanId();
     }
 
-    public Configuration toConfigurationNode(ConvertedConfiguration convertedConfiguration){
+    public Configuration toConfigurationNode(Region region, ConvertedConfiguration convertedConfiguration) {
 
         Configuration cfgNode = Configuration.builder()
                 .setHostname(getCleanId())
@@ -52,8 +72,8 @@ public class NatGateway extends Resource implements Serializable {
                 .build();
 
         {   // Internet
-            Interface.builder()
-                    .setName("backbone")
+            Interface toInternet = Interface.builder()
+                    .setName(AzureConfiguration.BACKBONE_FACING_INTERFACE_NAME)
                     .setVrf(cfgNode.getDefaultVrf())
                     .setOwner(cfgNode)
                     .setType(InterfaceType.PHYSICAL)
@@ -73,14 +93,45 @@ public class NatGateway extends Resource implements Serializable {
                     .build();
 
             BgpUnnumberedPeerConfig.builder()
-                    .setPeerInterface("backbone")
-                    .setRemoteAs(8075)
+                    .setPeerInterface(AzureConfiguration.BACKBONE_FACING_INTERFACE_NAME)
+                    .setRemoteAs(AzureConfiguration.AZURE_BACKBONE_ASN)
                     .setLocalIp(AzureConfiguration.LINK_LOCAL_IP)
                     .setLocalAs(AzureConfiguration.AZURE_LOCAL_ASN)
                     .setBgpProcess(process)
                     .setIpv4UnicastAddressFamily(
-                        Ipv4UnicastAddressFamily.builder().setExportPolicy("test").build())
+                        Ipv4UnicastAddressFamily.builder().setExportPolicy(
+                                AzureConfiguration.AWS_SERVICES_GATEWAY_EXPORT_POLICY_NAME).build())
                     .build();
+
+            for(PublicIpAddressId id : getProperties().getPublicIpAddresses()){
+                PublicIpAddress publicIpAddress = region.getPublicIpAddresses().get(id.getId());
+
+                // todo : handle multiple public ips not in the same range
+                toInternet.setOutgoingTransformation(
+                        Transformation.when(
+                                new MatchHeaderSpace(HeaderSpace.builder().setIpProtocols(NAT_PROTOCOLS).build())
+                        ).apply(
+                                TransformationStep.assignSourceIp(publicIpAddress.getProperties().getIpAddress()),
+                                TransformationStep.assignSourcePort(1024,65525)
+                        ).build()
+                );
+
+                // need to create a null route so we can advertise the prefix before sending traffic to the right host
+                StaticRoute st = StaticRoute.builder()
+                        .setNextHopInterface(NULL_INTERFACE_NAME)
+                        .setNetwork(publicIpAddress.getProperties().getIpAddress().toPrefix())
+                        .setAdministrativeCost(0)
+                        .setMetric(0)
+                        .setNonForwarding(true)
+                        .build();
+
+                cfgNode.getDefaultVrf().getStaticRoutes().add(st);
+
+                PrefixSpace pf = new PrefixSpace();
+                pf.addPrefix(publicIpAddress.getProperties().getIpAddress().toPrefix());
+                installRoutingPolicyAdvertiseStatic(AzureConfiguration.AWS_SERVICES_GATEWAY_EXPORT_POLICY_NAME, cfgNode, pf);
+            }
+
 
         }
         {   // Subnet
@@ -90,32 +141,22 @@ public class NatGateway extends Resource implements Serializable {
                     .setOwner(cfgNode)
                     .setAddress(LinkLocalAddress.of(AzureConfiguration.LINK_LOCAL_IP))
                     .build();
-
-            StaticRoute st = StaticRoute.builder()
-                    .setNetwork(Prefix.parse("88.183.185.217/32"))
-                    .setNextHop(NextHop.legacyConverter("subnet", AzureConfiguration.LINK_LOCAL_IP))
-                    .setNonForwarding(false)
-                    .setAdministrativeCost(0)
-                    .setMetric(0)
-                    .build();
-
-            cfgNode.getDefaultVrf().getStaticRoutes().add(st);
         }
 
 
         return cfgNode;
     }
 
-    public NatGatewayProperties getProperties() {
+    public Properties getProperties() {
         return _properties;
     }
 
-    public static class NatGatewayProperties implements Serializable {
+    public static class Properties implements Serializable {
         private final Set<PublicIpAddressId> _publicIpAddresses;
         private final Set<PublicIpPrefixId>  _publicIpPrefixes;
 
         @JsonCreator
-        public NatGatewayProperties(
+        public Properties(
                 @JsonProperty("publicIpAddresses") Set<PublicIpAddressId> publicIpAddresses,
                 @JsonProperty("publicIpPrefixes") Set<PublicIpPrefixId> publicIpPrefixes
         ) {
@@ -132,6 +173,7 @@ public class NatGateway extends Resource implements Serializable {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PublicIpAddressId implements Serializable {
         private final String _id;
 
@@ -146,6 +188,7 @@ public class NatGateway extends Resource implements Serializable {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PublicIpPrefixId implements Serializable {
         private final String _id;
 
